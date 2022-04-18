@@ -1,0 +1,11 @@
+[Unit]
+Description=MQTT front end wrapper to pywizlight
+
+[Service]
+User=pi
+Type=simple
+ExecStart=/home/pi/mqtt2wiz/mqtt2wiz/bin/start_mqtt2wiz.sh /home/pi/mqtt2wiz/config/config.yaml
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,21 @@
+---
+
+#knobs:
+    # log_level_debug: true
+    # log_to_console: false
+mqtt:
+    host: 192.168.0.143
+    client_id: mqtt2wiz
+    #username:
+    #password:
+    #reconnect_interval:
+
+globals:
+    topic_format: /{}/
+
+devices:
+    gu10_bulb:
+        host: 192.168.0.103
+        #topic:
+
+...
