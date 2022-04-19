@@ -22,14 +22,14 @@ class Cfg:
         attr = self._get_info().mqtt
         if isinstance(attr, collections.abc.Mapping):
             return attr.get("host", "192.168.1.100")
-        return const.MQTT_DEFAULT_BROKER_IP
+        return "192.168.1.100"
 
     @property
     def mqtt_client_id(self):
         attr = self._get_info().mqtt
         if isinstance(attr, collections.abc.Mapping):
             return attr.get("client_id", "mqtt2wiz")
-        return const.MQTT_DEFAULT_CLIENT_ID
+        return "mqtt2wiz"
 
     @property
     def mqtt_username(self):
