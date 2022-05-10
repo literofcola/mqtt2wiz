@@ -14,8 +14,30 @@ globals:
     topic_format: /{}/
 
 devices:
-    gu10_bulb:
+    gu10_1:
         host: 192.168.0.103
         #topic:
+    gu10_2:
+        host: 192.168.0.131
+    gu10_3:
+        host: 192.168.0.183
+    gu10_4:
+        host: 192.168.0.101
+    gu10_5:
+        host: 192.168.0.127
+    stairs_1:
+        host: 192.168.0.180
+    stairs_2:
+        host: 192.168.0.168
+    stairs_3:
+        host: 192.168.0.124
+    stairs_4:
+        host: 192.168.0.130
+    stairs_5:
+        host: 192.168.0.136
+    stairs_6:
+        host: 192.168.0.119
+    stairs_7:
+        host: 192.168.0.126
 
 ...

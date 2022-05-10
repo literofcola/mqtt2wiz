@@ -2,6 +2,7 @@
 import asyncio
 import collections
 import random
+import colorsys
 from typing import Dict
 from dataclasses import dataclass
 from contextlib import AsyncExitStack, asynccontextmanager
@@ -80,7 +81,6 @@ async def MQTT_Receive_Callback(messages):
 
             #todo: json payloads
             if message.payload.decode() == 'on':
-                #random_color = random.choices(range(256), k=3)
                 try:
                     await device_list[message.topic].wiz.turn_on(PilotBuilder(colortemp=3000, brightness=255))
                     logger.debug(f"turn_on device {device_list[message.topic].name} @ {device_list[message.topic].host}")
@@ -94,13 +94,25 @@ async def MQTT_Receive_Callback(messages):
                 except Exception as e:
                     logger.debug(e)
 
+            if "B" in message.payload.decode(): #Brightness slider
+                value = message.payload.decode().lstrip('B')
+                value = int(value)
+                try:
+                    await device_list[message.topic].wiz.turn_on(PilotBuilder(brightness=value))
+                    logger.debug(f"turn_on device {device_list[message.topic].name} @ {device_list[message.topic].host} with brightness {value}")
+                except Exception as e:
+                    logger.debug(e)
+
             if "#" in message.payload.decode(): #parse as Hex RGB
                 value = message.payload.decode().lstrip('#')
                 lv = len(value)
                 wanted_rgb = tuple(int(value[i:i+lv//3], 16) for i in range(0, lv, lv//3))
+                #hsv_norm = tuple(x/255 for x in wanted_rgb)
+                #wanted_hsv = colorsys.rgb_to_hsv(*hsv_norm)
+                new_rgbw = (wanted_rgb[0], wanted_rgb[1], wanted_rgb[2], 0) #gave up trying to find an appropriate rgbw from given rgb. set w to 0
                 try:
-                    await device_list[message.topic].wiz.turn_on(PilotBuilder(rgb=wanted_rgb))
-                    logger.debug(f"turn_on device {device_list[message.topic].name} @ {device_list[message.topic].host} with color with color {wanted_rgb}")
+                    await device_list[message.topic].wiz.turn_on(PilotBuilder(rgbw=new_rgbw))
+                    logger.debug(f"turn_on device {device_list[message.topic].name} @ {device_list[message.topic].host} with color {new_rgbw}")
                 except Exception as e:
                     logger.debug(e)
 
