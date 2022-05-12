@@ -3,6 +3,7 @@ import asyncio
 import collections
 import random
 import colorsys
+import json
 from typing import Dict
 from dataclasses import dataclass
 from contextlib import AsyncExitStack, asynccontextmanager
@@ -79,7 +80,48 @@ async def MQTT_Receive_Callback(messages):
         # Check if the received message topic matches one of our devices
         if device_list.get(message.topic, None):
 
-            #todo: json payloads
+            try:
+                json_state = json.loads(message.payload.decode())
+                is_json = True
+            except ValueError as e:
+                # logger.debug(f"MQTT_Receive_Callback received non-json payload")
+                is_json = False
+            except TypeError as e:
+                # logger.debug(f"MQTT_Receive_Callback received non-json payload")
+                is_json = False
+
+            if is_json == True:
+
+                if 'state' in json_state and json_state['state'] == "on":
+                    try:
+                        await device_list[message.topic].wiz.turn_on(PilotBuilder(colortemp=3000, brightness=255))
+                        logger.debug(f"turn_on device {device_list[message.topic].name} @ {device_list[message.topic].host}")
+                    except Exception as e:
+                        logger.debug(e)
+
+                if 'state' in json_state and json_state['state'] == "off":
+                    try:
+                        await device_list[message.topic].wiz.turn_off()
+                        logger.debug(f"turn_off device {device_list[message.topic].name} @ {device_list[message.topic].host}")
+                    except Exception as e:
+                        logger.debug(e)
+
+                if 'brightness' in json_state:
+                    value = int(json_state['brightness'])
+                    try:
+                        await device_list[message.topic].wiz.turn_on(PilotBuilder(brightness=value))
+                        logger.debug(f"turn_on device {device_list[message.topic].name} @ {device_list[message.topic].host} with brightness {value}")
+                    except Exception as e:
+                        logger.debug(e)
+                
+                if 'temperature' in json_state:
+                    value = int(json_state['temperature'])
+                    try:
+                        await device_list[message.topic].wiz.turn_on(PilotBuilder(colortemp=value))
+                        logger.debug(f"turn_on device {device_list[message.topic].name} @ {device_list[message.topic].host} with colortemp {value}")
+                    except Exception as e:
+                        logger.debug(e)
+
             if message.payload.decode() == 'on':
                 try:
                     await device_list[message.topic].wiz.turn_on(PilotBuilder(colortemp=3000, brightness=255))
@@ -91,15 +133,6 @@ async def MQTT_Receive_Callback(messages):
                 try:
                     await device_list[message.topic].wiz.turn_off()
                     logger.debug(f"turn_off device {device_list[message.topic].name} @ {device_list[message.topic].host}")
-                except Exception as e:
-                    logger.debug(e)
-
-            if "B" in message.payload.decode(): #Brightness slider
-                value = message.payload.decode().lstrip('B')
-                value = int(value)
-                try:
-                    await device_list[message.topic].wiz.turn_on(PilotBuilder(brightness=value))
-                    logger.debug(f"turn_on device {device_list[message.topic].name} @ {device_list[message.topic].host} with brightness {value}")
                 except Exception as e:
                     logger.debug(e)
 
