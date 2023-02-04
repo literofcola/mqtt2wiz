@@ -122,6 +122,15 @@ async def MQTT_Receive_Callback(messages):
                     except Exception as e:
                         logger.debug(e)
 
+                if 'scene' in json_state:
+                    value = int(json_state['scene'])
+                    try:
+                        await device_list[message.topic].wiz.turn_on(PilotBuilder(scene=value))
+                        logger.debug(f"turn_on device {device_list[message.topic].name} @ {device_list[message.topic].host} with scene {value}")
+                    except Exception as e:
+                        logger.debug(e)
+
+
             if message.payload.decode() == 'on':
                 try:
                     await device_list[message.topic].wiz.turn_on(PilotBuilder(colortemp=3000, brightness=255))
